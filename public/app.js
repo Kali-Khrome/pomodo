@@ -4,6 +4,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const stacked = matchMedia('not ((min-width: 880px) and (min-height: 560px))');
 const PPM = 20;
 const NAMES = { focus: 'Focus', short: 'Short break', long: 'Long break' };
+const ASSORTED = { id: 'assorted', title: 'Assorted work', db: null };
 
 const store = {
   get: (k, d) => { try { return JSON.parse(localStorage.getItem('pomodo.' + k)) ?? d } catch { return d } },
@@ -113,7 +114,9 @@ function advance(counted) {
     next = round >= cfg.every ? 'long' : 'short';
   } else if (mode === 'long') round = 0;
   store.set('round', round);
-  setMode(next).then(() => counted && cfg.auto && start());
+  // A view transition waits for the next painted frame, which never comes while the window is covered.
+  const shown = Promise.race([setMode(next), new Promise(r => setTimeout(r, 1000))]);
+  shown.then(() => counted && cfg.auto && start());
 }
 
 function unlockAudio() {
@@ -226,8 +229,15 @@ async function write(id, properties) {
 function renderTasks() {
   const list = $('#list'), canFinish = !!prop(cfg.doneProp);
   $('#count').textContent = $('#sideCount').textContent = tasks.length;
-  if (!tasks.length) return list.replaceChildren(empty('Nothing open. Add a task below.'));
-  list.replaceChildren(...tasks.map(t => {
+  const general = document.createElement('li'), gp = document.createElement('button');
+  general.className = 'assorted' + (current?.id === ASSORTED.id ? ' on' : '');
+  gp.className = 'pick';
+  gp.textContent = ASSORTED.title;
+  gp.append(Object.assign(document.createElement('sup'), { textContent: 'not logged' }));
+  gp.onclick = () => choose(ASSORTED);
+  general.append(gp);
+  if (!tasks.length) return list.replaceChildren(general, empty('Nothing open. Add a task below.'));
+  list.replaceChildren(general, ...tasks.map(t => {
     const li = document.createElement('li'), pick = document.createElement('button');
     li.classList.toggle('on', t.id === current?.id);
     pick.className = 'pick';
@@ -248,11 +258,12 @@ function renderTasks() {
 const empty = text => Object.assign(document.createElement('li'), { className: 'empty', textContent: text });
 
 function choose(t) {
-  current = { id: t.id, title: t.title, db: schema.id, countProp: prop(cfg.countProp)?.type === 'number' ? cfg.countProp : null };
+  current = t === ASSORTED ? ASSORTED : { id: t.id, title: t.title, db: schema.id, countProp: prop(cfg.countProp)?.type === 'number' ? cfg.countProp : null };
   store.set('current', current);
   $('#task').textContent = t.title;
   renderTasks();
   if (stacked.matches) $('.timer').scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth' });
+  if (t === ASSORTED) return;
   const p = prop(cfg.doneProp);
   if (p?.type === 'status') {
     const g = groups(p);
@@ -282,6 +293,7 @@ async function finish(t, li) {
 
 // Reads the current count from Notion first, so edits made elsewhere aren't overwritten.
 async function logPomo(task) {
+  if (task.id === ASSORTED.id) return;
   const name = task.db === schema?.id ? prop(cfg.countProp)?.type === 'number' && cfg.countProp : task.countProp;
   if (!name) return;
   try {

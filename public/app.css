@@ -101,6 +101,8 @@ svg{width:16px;height:16px;fill:currentColor}
 .pick sup{font-size:.34em;font-weight:500;color:var(--mute);line-height:0;vertical-align:.95em;margin-left:.35em;letter-spacing:0}
 .done{flex:none;width:28px;height:28px;margin-right:10px;border-radius:50%;border:1.5px solid var(--line);transition:border-color .2s,background .2s}
 .done:hover{border-color:var(--ink);background:radial-gradient(var(--ink) 30%,transparent 34%)}
+.assorted{border-bottom:1px solid var(--line);margin:0 12px 8px;padding-bottom:8px}
+.assorted .pick{padding-left:0;padding-right:0}
 .leaving{animation:out .4s var(--ease) forwards}
 .entering{animation:rise .5s var(--ease) both}
 .empty{color:var(--mute);padding:4px 12px;font-size:1rem;line-height:1.4}
