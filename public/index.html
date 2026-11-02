@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-mode="focus">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#c6c5c1">
+<title>PomoDo.</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23ff4a2e'/></svg>">
+<link rel="stylesheet" href="app.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<main class="app">
+  <section class="card timer" aria-label="Timer">
+    <header class="bar">
+      <h1 class="brand">PomoDo<i>.</i></h1>
+      <button class="icon side" id="side" aria-controls="tasks" aria-expanded="true" title="Hide tasks (T)"><span class="c" id="sideCount"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M14.5 5v14"/></svg></button>
+      <nav class="seg" role="tablist" aria-label="Mode">
+        <button role="tab" data-m="focus">Focus</button><button role="tab" data-m="short">Short</button><button role="tab" data-m="long">Long</button>
+      </nav>
+    </header>
+    <div class="readout">
+      <h2 class="label"><span id="mode">Focus</span><span class="dots" id="dots"></span></h2>
+      <output class="time" id="time" aria-live="off"><span class="lead" id="lead"></span><span id="mm">25</span>:<span id="ss">00</span></output>
+      <p class="sub" id="sub"></p>
+    </div>
+    <div class="dial" aria-hidden="true"><div class="scale" id="scale"></div><b class="needle"></b></div>
+    <button class="now" id="now"><small id="nowLabel">Now focusing</small><strong id="task">Pick a task</strong></button>
+    <div class="controls">
+      <button id="reset" aria-label="Restart session" title="Restart (R)"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM18 5v14L9 12z"/></svg></button>
+      <button id="go" class="go" title="Start / pause (Space)">Start</button>
+      <button id="skip" aria-label="Skip to next session" title="Skip (S)"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM6 5v14l9-7z"/></svg></button>
+    </div>
+  </section>
+
+  <section class="card tasks" id="tasks" aria-label="Notion tasks">
+    <header class="bar">
+      <label class="pill"><select id="db" aria-label="Notion database"><option>Loading…</option></select><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></label>
+      <button class="icon" id="refresh" aria-label="Sync with Notion" title="Sync"><svg viewBox="0 0 24 24"><path d="M17.65 6.35A8 8 0 1 0 19.73 14h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg></button>
+      <button class="icon" id="menu" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16" stroke="currentColor" stroke-width="1.8" fill="none"/></svg></button>
+    </header>
+    <div class="head">
+      <h2 class="label">To do<span class="n" id="count">0</span></h2>
+      <p class="sub">Tap a task to focus on it. Tap ○ to complete it.</p>
+    </div>
+    <ol class="list" id="list"><li class="empty">Loading…</li></ol>
+    <form class="add" id="add" autocomplete="off">
+      <input name="t" placeholder="New task" aria-label="New task" maxlength="200" required>
+      <button class="go">Add</button>
+    </form>
+  </section>
+</main>
+
+<dialog id="settings">
+  <form method="dialog" id="cfg">
+    <h3>Settings</h3>
+    <label>Done when<select name="doneProp"></select></label>
+    <fieldset class="hide" id="hide" hidden><legend>Hide tasks that are</legend><div></div></fieldset>
+    <label>Log pomodoros to<select name="countProp"></select></label>
+    <div class="row">
+      <label>Focus<input name="focus" type="number" min="1" max="90"></label>
+      <label>Short<input name="short" type="number" min="1" max="30"></label>
+      <label>Long<input name="long" type="number" min="1" max="60"></label>
+      <label>Every<input name="every" type="number" min="2" max="8"></label>
+    </div>
+    <label class="check">Auto-start next session<input name="auto" type="checkbox"></label>
+    <label class="check">Chime<input name="sound" type="checkbox"></label>
+    <p class="hint">Keys: Space start/pause · R restart · S skip · T tasks · 1 2 3 modes</p>
+    <button class="go" value="save">Save</button>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+</body>
+</html>
